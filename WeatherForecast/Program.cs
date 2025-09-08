@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using SimpleAuthentication;
 using TinyHelpers.AspNetCore.Extensions;
 using TinyHelpers.AspNetCore.OpenApi;
@@ -48,21 +49,23 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/api/weather/current", async (string city, WeatherService weatherService, CancellationToken cancellationToken) =>
+app.MapGet("/api/weather/current", async ([Description("The city for which to get the current weather condition")] string city, WeatherService weatherService, CancellationToken cancellationToken) =>
 {
     var weather = await weatherService.GetCurrentWeatherAsync(city, cancellationToken);
     var response = new Weather(weather);
 
     return TypedResults.Ok(response);
-});
+})
+.WithSummary("Get the current weather condition. This is the method to get weather of today");
 
-app.MapGet("/api/weather/daily", async (string city,
-    int days,
+app.MapGet("/api/weather/daily", async ([Description("The city for which to get the weather forecast for the next days.")] string city,
+    [Description("The number of days for which to return the forecast (from 1 to 16)")] int days,
     WeatherService weatherService, CancellationToken cancellationToken) =>
 {
     var weather = await weatherService.GetWeatherForecastAsync(city, days, cancellationToken);
     return TypedResults.Ok(weather);
-});
+})
+.WithSummary("Get the weather condition for the next days. If you want to get the current condition, you should call the /api/weather/current endpoint");
 
 app.Run();
 
