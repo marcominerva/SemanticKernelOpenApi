@@ -94,6 +94,7 @@ public class OpenApiPluginLoader(PluginRegistry registry, IServiceProvider servi
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var kernel = new Kernel();
+
         var plugin = await kernel.ImportPluginFromOpenApiAsync(pluginName: "weatherforecast",
             uri: new Uri("https://localhost:7219/openapi/v1.json"),
             executionParameters: new()
@@ -105,32 +106,13 @@ public class OpenApiPluginLoader(PluginRegistry registry, IServiceProvider servi
                     var httpContext = serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext;
                     if (httpContext?.Request.Headers.TryGetValue("x-api-key", out var authHeader) == true)
                     {
-                        request.Headers.Add("x-api-key", [authHeader.ToString()]);
+                        request.Headers.Add("x-api-key", authHeader.ToString());
                     }
 
                     return Task.CompletedTask;
                 }
             }
             , cancellationToken: stoppingToken);
-
-        //var plugin = await kernel.ImportPluginFromOpenApiAsync(pluginName: "weatherforecast",
-        //    uri: new Uri("https://localhost:7274/openapi/ai.json"),
-        //    executionParameters: new()
-        //    {
-        //        EnablePayloadNamespacing = true,
-        //        ServerUrlOverride = new Uri("https://localhost:7274"),
-        //        AuthCallback = (request, cancellationToken) =>
-        //        {
-        //            var httpContext = serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext;
-        //            if (httpContext?.Request.Headers.TryGetValue("x-api-key", out var authHeader) == true)
-        //            {
-        //                request.Headers.Add("x-api-key", [authHeader.ToString()]);
-        //            }
-
-        //            return Task.CompletedTask;
-        //        }
-        //    }
-        //    , cancellationToken: stoppingToken);
 
         registry.Add(plugin);
     }

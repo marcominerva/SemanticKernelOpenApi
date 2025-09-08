@@ -14,6 +14,16 @@ builder.Services.AddAzureOpenAIChatCompletion(Constants.Model, Constants.Endpoin
 
 var kernel = builder.Build();
 
+var plugin = await kernel.ImportPluginFromOpenApiAsync(
+    pluginName: "weatherforecast",
+    uri: new Uri("https://localhost:7219/openapi/v1.json"),
+    executionParameters: new()
+    {
+        EnablePayloadNamespacing = true,
+        ServerUrlOverride = new Uri("https://localhost:7219")        
+    }
+);
+
 var aiRequestSettings = new AzureOpenAIPromptExecutionSettings
 {
     MaxTokens = 400,
@@ -23,6 +33,14 @@ var aiRequestSettings = new AzureOpenAIPromptExecutionSettings
 // Q&A loop
 var chat = kernel.GetRequiredService<IChatCompletionService>();
 var history = new ChatHistory();
+
+// Add system message with instructions for handling unknown questions
+history.AddSystemMessage("""
+    You are an assistant that can ONLY answer by using the available functions. For every user question, you MUST invoke a function to answer. 
+    When you identify a function that can answer the user's question but you don't have all the required parameters or inputs needed to call that function, you MUST ask the user to provide the missing information. Be specific about what information is needed and why.
+    If there is NO function that allows you to answer the question, you MUST reply that you don't know the answer or cannot provide the requested information and do NOT provide any other information.
+    Always prioritize asking for missing parameters over declining to answer, as long as there is a relevant function available.
+    """);
 
 while (true)
 {
