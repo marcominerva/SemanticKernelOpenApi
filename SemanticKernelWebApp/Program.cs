@@ -68,7 +68,6 @@ app.MapPost("/api/ask", async (Kernel kernel, IChatCompletionService chat, strin
         ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
     };
 
-    // Q&A loop
     var history = new ChatHistory();
 
     // Add system message with instructions for handling unknown questions
