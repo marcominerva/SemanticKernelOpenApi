@@ -14,13 +14,13 @@ builder.Services.AddAzureOpenAIChatCompletion(Constants.Model, Constants.Endpoin
 
 var kernel = builder.Build();
 
-var plugin = await kernel.ImportPluginFromOpenApiAsync(
+await kernel.ImportPluginFromOpenApiAsync(
     pluginName: "weatherforecast",
     uri: new Uri("https://localhost:7219/openapi/v1.json"),
     executionParameters: new()
     {
         EnablePayloadNamespacing = true,
-        ServerUrlOverride = new Uri("https://localhost:7219")        
+        ServerUrlOverride = new Uri("https://localhost:7219")
     }
 );
 
