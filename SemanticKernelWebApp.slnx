@@ -3,5 +3,5 @@
     <File Path=".editorconfig" />
     <File Path="Directory.Build.props" />
   </Folder>
-  <Project Path="SemanticKernelWebApp/SemanticKernelWebApp.csproj" />
+  <Project Path="src/SemanticKernelWebApp/SemanticKernelWebApp.csproj" />
 </Solution>

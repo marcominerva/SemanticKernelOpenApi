@@ -3,5 +3,5 @@
     <File Path=".editorconfig" />
     <File Path="Directory.Build.props" />
   </Folder>
-  <Project Path="WeatherForecast/WeatherForecast.csproj" />
+  <Project Path="src/WeatherForecast/WeatherForecast.csproj" />
 </Solution>
