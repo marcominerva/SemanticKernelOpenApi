@@ -17,11 +17,11 @@ var aiSettings = builder.Services.ConfigureAndGet<AzureOpenAISettings>(builder.C
 
 builder.Services.AddSimpleAuthentication(builder.Configuration);
 
-builder.Services.AddSingleton<PluginRegistry>();
-builder.Services.AddHostedService<OpenApiPluginLoader>();
-
 builder.Services.AddKernel()
     .AddAzureOpenAIChatCompletion(aiSettings.Deployment, aiSettings.Endpoint, aiSettings.ApiKey);
+
+builder.Services.AddSingleton<PluginRegistry>();
+builder.Services.AddHostedService<OpenApiPluginLoader>();
 
 builder.Services.AddTransient(services =>
 {
@@ -92,9 +92,11 @@ public class OpenApiPluginLoader(PluginRegistry registry, IServiceProvider servi
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+
         var kernel = new Kernel();
 
-        var plugin = await kernel.ImportPluginFromOpenApiAsync(pluginName: "weatherforecast",
+        var plugin = await kernel.ImportPluginFromOpenApiAsync(pluginName: "northwind",
             uri: new Uri("https://localhost:7219/openapi/v1.json"),
             executionParameters: new()
             {
@@ -102,11 +104,16 @@ public class OpenApiPluginLoader(PluginRegistry registry, IServiceProvider servi
                 ServerUrlOverride = new Uri("https://localhost:7219"),
                 AuthCallback = (request, cancellationToken) =>
                 {
-                    var httpContext = serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext;
-                    if (httpContext?.Request.Headers.TryGetValue("x-api-key", out var authHeader) == true)
-                    {
-                        request.Headers.Add("x-api-key", authHeader.ToString());
-                    }
+                    request.Headers.Add("User-Agent", "SemanticKernel");
+                    request.Headers.Add("x-api-key", "f1I7S5GXa4wQDgLQWgz0");
+
+                    // It is possible to use the incoming request's headers for authentication, for example
+                    // by using the IHttpContextAccessor to access the current HttpContext.
+                    //var httpContext = serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext;
+                    //if (httpContext?.Request.Headers.TryGetValue("x-api-key", out var authHeader) == true)
+                    //{
+                    //    request.Headers.Add("x-api-key", authHeader.ToString());
+                    //}
 
                     return Task.CompletedTask;
                 }
