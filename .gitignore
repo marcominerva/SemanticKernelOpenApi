@@ -417,5 +417,5 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
-/WeatherForecast/appsettings.local.json
-/SemanticKernelWebApp/appsettings.local.json
+/src/WeatherForecast/appsettings.local.json
+/src/SemanticKernelWebApp/appsettings.local.json
